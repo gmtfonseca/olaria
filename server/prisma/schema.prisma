@@ -1,0 +1,104 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["orderByRelation"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(255)
+  password String  @db.VarChar(20)
+  inactive Boolean @default(false)
+
+  createdPonds  Pond[] @relation("CreatedPonds")
+  modifiedPonds Pond[] @relation("ModifiedPonds")
+
+  createdFishes  Fish[] @relation("CreatedFishes")
+  modifiedFishes Fish[] @relation("ModifiedFishes")
+
+  createdMovements  Movement[] @relation("CreatedMovements")
+  modifiedMovements Movement[] @relation("ModifiedMovements")
+
+  @@unique([name])
+  @@map(name: "users")
+}
+
+model Pond {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  area        Int?
+  inactive    Boolean     @default(false)
+  movements   Movement[]
+  inventories Inventory[]
+
+  createdBy  User? @relation(name: "CreatedPonds", fields: [createdById], references: [id])
+  modifiedBy User? @relation(name: "ModifiedPonds", fields: [modifiedById], references: [id])
+
+  createdById  Int? @map("created_by_id")
+  modifiedById Int? @map("modified_by_id")
+
+  @@unique([name])
+  @@map(name: "ponds")
+}
+
+model Inventory {
+  id       Int  @id @default(autoincrement())
+  fish     Fish @relation(fields: [fishId], references: [id])
+  pond     Pond @relation(fields: [pondId], references: [id])
+  fishId   Int  @map("fish_id")
+  pondId   Int  @map("pond_id")
+  quantity Int
+
+  @@unique([fishId, pondId])
+  @@index([pondId])
+  @@map(name: "inventories")
+}
+
+model Movement {
+  id       Int            @id @default(autoincrement())
+  datetime DateTime       @default(now()) @db.Timestamp(0)
+  action   MovementAction
+  quantity Int
+  fish     Fish           @relation(fields: [fishId], references: [id])
+  pond     Pond           @relation(fields: [pondId], references: [id])
+  fishId   Int            @map("fish_id")
+  pondId   Int            @map("pond_id")
+  notes    String?        @db.VarChar(255)
+
+  createdBy  User? @relation(name: "CreatedMovements", fields: [createdById], references: [id])
+  modifiedBy User? @relation(name: "ModifiedMovements", fields: [modifiedById], references: [id])
+
+  createdById  Int? @map("created_by_id")
+  modifiedById Int? @map("modified_by_id")
+
+  @@index([fishId, pondId])
+  @@index([pondId])
+  @@index([datetime])
+  @@map(name: "movements")
+}
+
+model Fish {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  inactive    Boolean     @default(false)
+  movements   Movement[]
+  inventories Inventory[]
+
+  createdBy  User? @relation(name: "CreatedFishes", fields: [createdById], references: [id])
+  modifiedBy User? @relation(name: "ModifiedFishes", fields: [modifiedById], references: [id])
+
+  createdById  Int? @map("created_by_id")
+  modifiedById Int? @map("modified_by_id")
+
+  @@unique([name])
+  @@map(name: "fishes")
+}
+
+enum MovementAction {
+  IN
+  OUT
+}

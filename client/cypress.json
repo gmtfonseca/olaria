@@ -1,0 +1,12 @@
+{
+  "pluginsFile": "tests/e2e/plugins/index.js",
+  "baseUrl": "http://localhost:8080",
+  "video": false,
+  "retries": 2,
+  "env": {
+    "API_URL": "http://localhost:9000/api",
+    "USERNAME": "john",
+    "PASSWORD": "doe123",
+    "TOKEN_KEY": "olaria_token"
+  }
+}
