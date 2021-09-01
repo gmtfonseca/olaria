@@ -6,10 +6,17 @@
 npm install
 ```
 
+
 ### Compiles and hot-reloads for development
 
 ```
 npm run dev
+```
+
+### Run MySQL Database
+
+```
+npm run docker:up
 ```
 
 ### Compiles and minifies for fishion
@@ -22,12 +29,6 @@ npm run build
 
 ```
 npm run test:unit
-```
-
-### Run your end-to-end tests
-
-```
-npm run test:e2e
 ```
 
 ### Lints and fixes files
